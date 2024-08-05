@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "base" ]
+    branches: [ "test" ]
 
 jobs:
   docker:
@@ -25,4 +25,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: microwin7/gravitlauncher:base
+          tags: microwin7/gravitlauncher:test
