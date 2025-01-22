@@ -1,0 +1,53 @@
+name: Docker Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Проверка исходного кода
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Шаг 2: Установка Docker Compose
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      # Шаг 3: Запуск docker-compose
+      - name: Start services
+        run: |
+          docker-compose up -d
+
+      # Шаг 4: Ожидание перезапуска приложения
+      - name: Wait for application to restart
+        run: |
+          echo "Waiting for application to restart..."
+          sleep 5 # Подождать первоначальный запуск
+          until [ "$(docker inspect --format '{{.State.Restarting}}' $(docker-compose ps -q app))" != "true" ]; do
+            echo "Waiting for restart..."
+            sleep 2
+          done
+
+      # Шаг 5: Убедиться, что сервис работает
+      - name: Check application is running
+        run: |
+          if [ "$(docker inspect --format '{{.State.Running}}' $(docker-compose ps -q app))" != "true" ]; then
+            echo "Application container is not running after restart."
+            exit 1
+          fi
+
+      # Шаг 6: Запуск тестов
+      - name: Run tests
+        run: |
+          docker-compose exec app /path/to/test/script.sh
+
+      # Шаг 7: Завершение работы контейнеров
+      - name: Stop services
+        if: always()
+        run: |
+          docker-compose down

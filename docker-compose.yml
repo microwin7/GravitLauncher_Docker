@@ -1,0 +1,65 @@
+services:
+  launcher:
+    container_name: launcher
+    build:
+      context: .
+      dockerfile: Dockerfile
+    mem_limit: 2048m
+    ports:
+      - 9275:9274
+    environment:
+      # ===== ВЕТКА на GITHUB (master - Релизная ветка | dev - Последние из Actions ветки dev) =====
+      LAUNCHER_BRANCH: master
+      RUNTIME_BRANCH: master
+      # ===== LaunchServer.json (НАСТРАИВАТЬ ЧЕРЕЗ ФАЙЛ .env) =====
+      ENV: ${ENV:-STD}
+      PROJECT_NAME: ${PROJECT_NAME:-GravitLauncher}
+      BINARY_NAME: ${BINARY_NAME:-Launcher}
+      # HTTP | HTTPS
+      NETTY_HTTP_PROTOCOL: ${NETTY_HTTP_PROTOCOL:-HTTP}
+      WS_ADDRESS: ${WS_ADDRESS:-"127.0.0.1:9275"}
+      URL_ADDRESS: ${URL_ADDRESS:-""}
+      NETTY_FILE_SERVER_ENABLED: ${NETTY_FILE_SERVER_ENABLED:-"true"}
+      NETTY_IP_FORWARDING: ${NETTY_IP_FORWARDING:-"false"}
+      NETTY_DISABLE_WEB_API_INTERFACE: ${NETTY_DISABLE_WEB_API_INTERFACE:-"false"}
+      NETTY_SHOW_HIDDEN_FILES: ${NETTY_SHOW_HIDDEN_FILES:-"false"}
+      # ===== Docker Container Settings =====
+      # Настройка прав пользователя и группы для файлов и папок
+      UID: 1001
+      GID: 1001
+      # Добавление модулей через запятую
+      # AdditionalHash,FileAuthSystem,MojangSupport,S3Updates,SentryProGuardUpload,UnsafeCommandPack
+      # DiscordBotConsole,FxRuntimeOptimizer,GenerateCertificate,MirrorHelper,OpenSSLSignCode,RemoteControl,TelegramBotConsole
+      MODULES: MirrorHelper,FileAuthSystem,GenerateCertificate,OpenSSLSignCode,Prestarter
+      # Добавление модулей через запятую
+      # Модуль JavaRuntime включён по умолчанию, и не может быть выключен
+      # LauncherGuard,LauncherStartScreen,DiscordGame,Sentry,SentryProGuardUpload,SystemdNotifier
+      LAUNCHER_MODULES: 
+      # Предварительное скачивание инсталлеров для MirrorHelper
+      # FORGE от 1.7.10 | NEOFORGE от 1.20.2
+      MIRROR_HELPER_INSTALLERS: >
+        {
+          "FORGE": [
+            "1.7.10"
+            ],
+          "NEOFORGE": [
+            ]
+        }
+    tty: true
+    stdin_open: true
+    restart: always
+    privileged: true
+    volumes:
+      - LAUNCHER_APP:/app/PUBLIC
+      - LAUNCHER_WORKDIR:/app
+
+volumes:
+  LAUNCHER_APP:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./APP
+      o: bind
+    name: LAUNCHER_APP
+  LAUNCHER_WORKDIR:
+    name: LAUNCHER_WORKDIR
