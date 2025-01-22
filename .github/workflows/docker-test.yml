@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "Waiting for application to restart..."
           sleep 5 # Подождать первоначальный запуск
-          until [ "$(docker inspect --format '{{.State.Restarting}}' $(docker-compose ps -q app))" != "true" ]; do
+          until [ "$(docker inspect --format '{{.State.Restarting}}' $(docker-compose ps -q launcher))" != "true" ]; do
             echo "Waiting for restart..."
             sleep 2
           done
@@ -38,7 +38,7 @@ jobs:
       # Шаг 5: Убедиться, что сервис работает
       - name: Check application is running
         run: |
-          if [ "$(docker inspect --format '{{.State.Running}}' $(docker-compose ps -q app))" != "true" ]; then
+          if [ "$(docker inspect --format '{{.State.Running}}' $(docker-compose ps -q launcher))" != "true" ]; then
             echo "Application container is not running after restart."
             exit 1
           fi
