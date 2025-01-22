@@ -1,4 +1,4 @@
-name: Docker Test
+name: Run Tests with Docker Compose
 
 on:
   workflow_dispatch:
@@ -11,6 +11,8 @@ jobs:
       # Шаг 1: Проверка исходного кода
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch || 'test2' }} # Берем ветку из input (по умолчанию main)
 
       # Шаг 2: Установка Docker Compose
       - name: Set up Docker Compose
