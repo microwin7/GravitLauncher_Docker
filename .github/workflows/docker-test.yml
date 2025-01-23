@@ -60,7 +60,7 @@ jobs:
             exit 1
           fi
       - name: Check locale inside container
-        run: docker-compose exec launcher locale
+        run: docker compose exec launcher locale
       # # Шаг 6: Запуск тестов
       # - name: Run tests
       #   run: |
