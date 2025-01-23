@@ -68,7 +68,7 @@ jobs:
 
       - name: Show logs
         # if: failure()
-        run: docker compose logs
+        run: docker compose logs --timestamps | sed -E 's/^([a-zA-Z0-9_-]+)  \| [0-9]{4}-[0-9]{2}-[0-9]{2}T([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})[0-9]+Z /\1 | [\2] | /'
       # Шаг 7: Завершение работы контейнеров
       - name: Stop services
         if: always()
