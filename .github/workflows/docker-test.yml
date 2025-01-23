@@ -3,14 +3,14 @@ name: Run Tests with Docker Compose
 on:
   workflow_dispatch:
 
-env:
-  LANG: ru_RU.UTF-8
-  LC_ALL: ru_RU.UTF-8
+
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    env:
+      LANG: ru_RU.UTF-8
+      LC_ALL: ru_RU.UTF-8
     steps:
       # Шаг 1: Проверка исходного кода
       - name: Checkout code
