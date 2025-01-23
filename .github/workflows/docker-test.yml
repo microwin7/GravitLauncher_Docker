@@ -28,7 +28,7 @@ jobs:
       #     echo "LANG=$LANG"
       #     echo "LC_ALL=$LC_ALL"
 
-      - name: Install locales and set language
+      - name: Set up Docker Compose
         run: |
           sudo apt update
           sudo apt install gnupg2 apt-transport-https curl -y
@@ -36,11 +36,6 @@ jobs:
           sudo chmod +x get-docker.sh
           sudo ./get-docker.sh
           sudo service docker start
-
-      - name: Set up Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker compose
 
       # Шаг 3: Запуск docker-compose
       - name: Start services
