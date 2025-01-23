@@ -14,7 +14,14 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || 'test2' }} # Берем ветку из input (по умолчанию main)
 
-      # Шаг 2: Установка Docker Compose
+      # Шаг 2: Установка локалей
+      - name: Install locales and set language
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen ru_RU.UTF-8
+          sudo update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
+
       - name: Set up Docker Compose
         run: |
           sudo apt-get update
