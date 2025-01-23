@@ -8,9 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      LANG: ru_RU.UTF-8
-      LC_ALL: ru_RU.UTF-8
     steps:
       # Шаг 1: Проверка исходного кода
       - name: Checkout code
@@ -25,6 +22,12 @@ jobs:
           sudo apt-get install -y locales
           sudo locale-gen ru_RU.UTF-8
           sudo update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
+      - name: Set environment variables for locale
+        run: |
+          export LANG=ru_RU.UTF-8
+          export LC_ALL=ru_RU.UTF-8
+          echo "LANG=$LANG"
+          echo "LC_ALL=$LC_ALL"
 
       - name: Set up Docker Compose
         run: |
