@@ -15,36 +15,44 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || 'test2' }} # Берем ветку из input (по умолчанию main)
 
-      # Шаг 2: Установка локалей
+      # - name: Install locales and set language
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y locales
+      #     sudo locale-gen ru_RU.UTF-8
+      #     sudo update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
+      # - name: Set environment variables for locale
+      #   run: |
+      #     export LANG=ru_RU.UTF-8
+      #     export LC_ALL=ru_RU.UTF-8
+      #     echo "LANG=$LANG"
+      #     echo "LC_ALL=$LC_ALL"
+
       - name: Install locales and set language
         run: |
-          sudo apt-get update
-          sudo apt-get install -y locales
-          sudo locale-gen ru_RU.UTF-8
-          sudo update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
-      - name: Set environment variables for locale
-        run: |
-          export LANG=ru_RU.UTF-8
-          export LC_ALL=ru_RU.UTF-8
-          echo "LANG=$LANG"
-          echo "LC_ALL=$LC_ALL"
+          sudo apt update
+          sudo apt install gnupg2 apt-transport-https curl -y
+          sudo curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo chmod +x get-docker.sh
+          sudo ./get-docker.sh
+          sudo service docker start
 
       - name: Set up Docker Compose
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker-compose
+          sudo apt-get install -y docker compose
 
       # Шаг 3: Запуск docker-compose
       - name: Start services
         run: |
-          docker-compose up -d
+          docker compose up -d
 
       # Шаг 4: Ожидание перезапуска приложения
       - name: Wait for application to restart
         run: |
           echo "Waiting for application to restart..."
-          sleep 20 # Подождать первоначальный запуск
-          until [ "$(docker inspect --format '{{.State.Restarting}}' $(docker-compose ps -q launcher))" != "true" ]; do
+          sleep 5 # Подождать первоначальный запуск
+          until [ "$(docker inspect --format '{{.State.Restarting}}' $(docker compose ps -q launcher))" != "true" ]; do
             echo "Waiting for restart..."
             sleep 2
           done
@@ -52,11 +60,12 @@ jobs:
       # Шаг 5: Убедиться, что сервис работает
       - name: Check application is running
         run: |
-          if [ "$(docker inspect --format '{{.State.Running}}' $(docker-compose ps -q launcher))" != "true" ]; then
+          if [ "$(docker inspect --format '{{.State.Running}}' $(docker compose ps -q launcher))" != "true" ]; then
             echo "Application container is not running after restart."
             exit 1
           fi
-
+      - name: Check locale inside container
+        run: docker-compose exec launcher locale
       # # Шаг 6: Запуск тестов
       # - name: Run tests
       #   run: |
@@ -64,9 +73,9 @@ jobs:
 
       - name: Show logs
         # if: failure()
-        run: docker-compose logs
+        run: docker compose logs
       # Шаг 7: Завершение работы контейнеров
       - name: Stop services
         if: always()
         run: |
-          docker-compose down
+          docker compose down
