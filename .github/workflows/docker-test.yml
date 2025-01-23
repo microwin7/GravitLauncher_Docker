@@ -50,7 +50,7 @@ jobs:
 
       - name: Show logs
         # if: failure()
-        run: docker-compose logs -n 10000
+        run: docker-compose logs
       # Шаг 7: Завершение работы контейнеров
       - name: Stop services
         if: always()
