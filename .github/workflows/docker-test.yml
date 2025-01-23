@@ -46,8 +46,10 @@ jobs:
       # Шаг 6: Запуск тестов
       - name: Run tests
         run: |
-          docker-compose exec app /path/to/test/script.sh
-
+          docker-compose exec launcher test/test.sh
+      - name: Show logs
+        # if: failure()
+        run: docker-compose logs -n 10000
       # Шаг 7: Завершение работы контейнеров
       - name: Stop services
         if: always()
