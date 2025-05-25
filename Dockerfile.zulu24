@@ -1,0 +1,47 @@
+FROM ubuntu:25.10
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Azul install OpenJDK 24
+RUN /bin/sh -c set -ex && \
+    apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install gnupg ca-certificates locales curl tzdata && \
+    echo "ru_RU.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen ru_RU.UTF-8 && \
+    curl -s https://repos.azul.com/azul-repo.key | gpg --dearmor -o /usr/share/keyrings/azul.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/azul.gpg] https://repos.azul.com/zulu/deb stable main" > /etc/apt/sources.list.d/zulu.list && \
+    apt-get -qq update && \
+    echo "Package: zulu24-*\nPin: version 24.0.1-*\nPin-Priority: 1001" > /etc/apt/preferences && \
+    apt-get -qq -y --no-install-recommends install zulu24-jdk=24.0.1-* && \
+    apt-get -qq -y purge --auto-remove gnupg curl && \
+    apt-get -qq -y dist-upgrade && \
+    apt-get install -y \
+    gnupg2 \
+    wget \
+    apt-transport-https \
+    unzip \
+    nano \
+    osslsigncode \
+    jq \
+    iproute2 && \
+    apt-get -qq -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Установка Sentry CLI
+RUN curl -sL https://sentry.io/get-cli/ | sh
+
+# Установка локалей
+
+RUN apt-get update && \
+    apt-get install -y locales && locale-gen ru_RU.UTF-8 && \
+    apt-get -qq -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+ENV LANGUAGE=ru_RU.utf8 \
+    LANG=ru_RU.utf8 \
+    LC_ALL=ru_RU.utf8
+RUN update-locale LANG=ru_RU.UTF-8 LC_ALL=ru_RU.UTF-8
+
+# Устанавливаем переменные окружения обратно в стандартное значение
+ENV DEBIAN_FRONTEND=dialog
