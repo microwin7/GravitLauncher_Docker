@@ -3,7 +3,15 @@ FROM ubuntu:25.10
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Azul install OpenJDK 24
-RUN /bin/sh -c set -ex && \
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+    OPEN_JFX_FILE_NAME="openjfx-24.0.1_linux-x64_bin-jmods.zip"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+    OPEN_JFX_FILE_NAME="openjfx-24.0.1_linux-aarch64_bin-jmods.zip"; \
+    else \
+    echo "Unsupported architecture" && exit 1; \
+    fi && \
+    /bin/sh -c set -ex && \
     apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install gnupg ca-certificates locales curl tzdata && \
     echo "ru_RU.UTF-8 UTF-8" >> /etc/locale.gen && \
@@ -26,7 +34,12 @@ RUN /bin/sh -c set -ex && \
     iproute2 && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    wget https://download2.gluonhq.com/openjfx/24.0.1/${OPEN_JFX_FILE_NAME} && \
+    unzip ${OPEN_JFX_FILE_NAME} && \
+    cp javafx-jmods-24.0.1/* /usr/lib/jvm/zulu24/jmods && \
+    rm -r javafx-jmods-24.0.1 && \
+    rm -rf ${OPEN_JFX_FILE_NAME}
 
 # Установка Sentry CLI
 RUN curl -sL https://sentry.io/get-cli/ | sh
